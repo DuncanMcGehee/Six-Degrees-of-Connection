@@ -4,11 +4,13 @@ Includes testing and benchmarking utilities for social network analysis.
 """
 
 import json
+from platform import node
 import time
 import random
 import sys
 from pathlib import Path
 from collections import deque
+from tracemalloc import start
 
 # ============================================================================
 # PART 1: BREADTH-FIRST SEARCH (BFS)
@@ -31,14 +33,27 @@ def bfs(graph, start, target):
         graph = {0: [1, 2], 1: [0, 3], 2: [0], 3: [1]}
         bfs(graph, 0, 3) returns [0, 1, 3]
     """
-    # TODO: Implement BFS
-    # Hints:
-    # - Use a queue (deque) to track nodes to visit
-    # - Track visited nodes to avoid cycles
-    # - Track parent pointers to reconstruct path
-    # - Return path from start to target as a list
+    # Track the nodes we've visted
+    visted = {start}
+
+    # Queue stores (current_node, path_to_current_node)
+    queue = deque([(start, [start])])
     
-    pass
+    while queue:
+        current, path = queue.popleft()
+        
+        # Check if we've found the target
+        if current == target:
+            return path
+        
+        # Explore all neigbors
+        for neighbor in graph.get(current, []):
+            if neighbor not in visted:
+                visted.add(neighbor)
+                queue.append((neighbor, path + [neighbor]))
+    
+    # No path exists
+    return []
 
 
 # ============================================================================
@@ -60,13 +75,22 @@ def dfs(graph, start):
         graph = {0: [1, 2], 1: [0, 3], 2: [0], 3: [1], 4: [5], 5: [4]}
         dfs(graph, 0) returns {0, 1, 2, 3}
     """
-    # TODO: Implement DFS
-    # Hints:
-    # - Use recursion or a stack to explore deeply
-    # - Track visited nodes to avoid infinite loops
-    # - Return a set of all reachable user IDs
+    visited = set()
     
-    pass
+    def dfs_recursive(node):
+        
+        # Mark this node as visited
+        visited.add(node)
+        
+        # Recursively search all unvisited neighbors
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                dfs_recursive(neighbor)
+    
+    # Start the recursive search
+    dfs_recursive(start)
+    return visited
+    
 
 
 # ============================================================================
